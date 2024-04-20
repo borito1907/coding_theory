@@ -1,0 +1,284 @@
+\documentclass{article}
+\usepackage{geometry}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{algorithm}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{mathtools}
+\usepackage{algpseudocode}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\usepackage{parskip}
+\newgeometry{vmargin={15mm}, hmargin={24mm,34mm}}
+\theoremstyle{definition} 
+\newtheorem{definition}{Definition}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\xtoc}{\lvert x \rvert ^{c}}
+\newcommand{\dprime}{\prime\prime}
+\newcommand{\opt}{\text{opt}}
+\newcommand{\bitstring}[1]{\{0,1\}^{#1}}
+\newcommand{\ran}{\text{Ran}}
+\DeclareMathOperator*{\E}{\mathbb{E}}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\title{Coding Theory}
+\date{March 2024}
+\author{Boran Erol}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+You'd like to a send message to another person using a noisy channel by adding
+redundancy to the original message. 
+
+\begin{definition}
+    An \textbf{error correcting code} is an injective map $Enc: \Sigma^{k} \xrightarrow{} \Sigma^{n}$.
+\end{definition}
+
+$\Sigma$ is called the alphabet, $q = \lvert \Sigma \rvert$, and $\Sigma^{k}$ is called the message space.
+Often, $q = 2$. $q$ might depend on $n$.
+
+$k$ is called the message length (sometimes dimension). $n$ is called the (block) length.
+$C = \ran(Enc)$. $C$ is sometimes called the code by an abuse of terminology. Any string $y \in C$ is called
+a codeword.
+
+\begin{definition}
+    The \textbf{rate} of a code is $\frac{k}{n}$.
+\end{definition}
+
+Notice that larger rates correspond to smaller redundancies.
+
+The ambient space $\Sigma^{n}$ can be seen as a sequence of $n$ letters, as a vector of size $n$ or even as 
+a function. Which interpretation we use depends on the context. For example, the vector interpretation is
+useful when $\Sigma$ is a field.
+
+You can't flip more than half of the bits -- it's impossible to recover the message.
+Prove this rigorously (look at previous notes).
+
+We say that a code is asymptotically optimal if the ratio of the lengths of the message
+and the codeword becomes 1.
+
+\begin{definition}[Hamming Distance]
+    The 
+\end{definition}
+
+The Hamming Distance turns $\Sigma^{n}$ into a metric space.
+
+The capabilities of a code crucially depend on the noise model.
+
+Hamming's model of bounding the total number of errors assumes nothing about the
+nature of noise, whereas Shannon's binary symettric channel with crossover probability
+$p$ assumes perfect knowledge about the channel.
+
+It should be noted that Hamming's channel is unbounded.
+
+\subsection{Basics}
+
+
+
+\newpage
+
+\section{Linear ECCs}
+
+Encoding is always efficient for linear ECCs.
+
+In general, given $G$ and a received word $z$, finding the $y$ in the rowspace of $G$ which
+is closest to $z$ is NP-Hard. However, for some codes, decoding can be done in polynomial time.
+
+Let's not talk about decoding. Let's simplify the problem. How can we tell whether $z = y$
+for some $y \in C$ efficiently? This is not easy using a spanning set. Instead, we need orthogonality.
+We're going to use $C^{\perp}$. Notice that $C^{\perp}$ is an $[n,n-k]_{q} $code and is called
+the \textbf{dual code of C}. Let $C^{\perp}$ act on $x \mapsto xH$. $H$ is called the
+\textbf{parity check matrix for C} and the rows of $H$ are orthogonal to every codeword
+of $C$.
+
+In linear codes, $d(C)$ is just the minimum Hamming weight of a non-zero codeword.
+
+Also, $d(C)$ is the minimum number of non-zero columns of $H$ which are linearly dependent.
+
+In $F_{2}$, two vectors are linearly dependent if and only if they're the same vector.
+Therefore, notice that if $H$ has unique non-zero columns, the minimum distance of $C$
+is at least 3.
+
+Notice that codes with high rate corresponds to short and fat parity check matrices $H$.
+
+Based on this discussion, one thing we can do is to put all non-zero unique vectors
+of size $n-k$ as the columns of $H$. This gives us the \textbf{Hamming code}.
+
+This gives us a $r \times 2^{r} - 1$ matrix and produces a $[2^{r},2^{r} - r - 1]_{2}$
+code. Notice that $k \approx n - \log (n)$, so the rate of the Hamming code is great.
+
+The Hamming Code is cute in the sense that we can immediately detect which bit was
+flipped using $H$. This is because $H(y + e_{i}) = He_{i}$, so flipping the ith bit
+produces the ith column of $H$.
+
+Hamming codes are perfect codes. The codespace is fully partitioned into Hamming balls.
+We're optimally packing codewords into our space.
+
+\newpage
+
+\section{The Codeword Test}
+
+\begin{theorem}
+    There is a time $O(n)$ randomized algorithm $T$ such that
+
+    \[ \Pr[T(C) = \text{ YES}] = \begin{cases} 
+        1 & \exists x: C = C_{x} \\
+        \leq 1 - \delta & \forall x: \Delta(C,C_{x}) \geq \delta \\
+     \end{cases}\] 
+\end{theorem}
+
+Notice that this is a randomized algorithm with one-sided error, so we can decrease the
+error probability by repetition.
+
+
+
+\newpage
+
+\section{Hadamard Codes}
+
+If we use the parity check matrices of Hamming codes as generator matrices and add the
+all zeros column as the first column (mostly for technical convenience), we get
+the Hadamard code.
+
+Let $x \in F_{2}^{n}$. The Hadamard code takes $x$ to $C_{x}$:
+
+\[ C_{x} = \begin{bmatrix}
+    \langle x, 000000000 \rangle \\ 
+    \langle x, 000000001 \rangle \\
+    \langle x, 000000010 \rangle \\
+    ... \\
+    \langle x, 111111111 \rangle
+\end{bmatrix}\]
+
+Notice that $C_{x} \in F_{2}^{2^{n}}$. The Hadamard code has terrible rate.
+
+\begin{definition}
+    For $x \in F_{2}^{r}$, define $L_{x}: F_{2}^{2} \xrightarrow{} F_{2}$ by 
+
+    \[ L_{x} : a \mapsto x_{1}a_{1} + ... + x_{r}a_{r} \]
+
+    $L_{x}$ are linear polynomials over $F_{2}$.
+\end{definition}
+
+This is kind of confusing: $x$'s are the coefficients and $a$'s are the variables.
+
+In this view, the Hadamard code takes $x$ to the "truth table" of $L_{x}$.
+
+Given an $x$, we construct a linear $r$-variate polynomial where the coefficients are $x_{i}$
+and evaluate this polynomial at all $2^{r}$ points.
+
+\begin{proposition}
+    Hadamard is an $[2^{r},r,2^{r} - 1]_{2}$ code.
+\end{proposition}
+\begin{proof}
+    Notice that there are $2^{r}$ possible inputs to the Hadamard code
+    and $2^{r}$ outputs for all of the inputs. If you list all the codewords
+    in rows, you get the Hadamard Matrix if you use 1s and -1s instead of
+    0s and 1s.
+
+    Then, to say that the distance between every two codewords is $n/2$
+    is the exact same thing as to say that every two rows are orthogonal.
+
+    This is true because the Hadamard matrix is a unitary matrix.
+\end{proof}
+\begin{proof}
+    
+\end{proof}
+
+
+In order to decode,
+
+\[ x = \begin{bmatrix}
+    C_{x}(e_{1}) \\ 
+    C_{x}(e_{2}) \\
+    ... \\
+    C_{x}(e_{n})
+\end{bmatrix}\]
+
+where $C_{x}(e_{i})$ means the entry corresponding to $e_{1}$ in the matrix $C_{x}$.
+
+\begin{theorem}
+    $\forall \delta \in [0, \frac{1}{4}]$, there exists a randomized algorithm that takes as input
+    $C \in F_{2}^{2^{n}}$ 
+\end{theorem}
+
+\begin{proof}
+    Sample $r \in \bitstring(n)$ and compute $\langle x,r \rangle + \langle x,r+u \rangle = \langle x,u \rangle$.
+
+    Assume that the bits corresponding to $r$ and $u+r$ are not corrupted.
+    More formally, assume that $C(r) = C_{x}(r)$ and $C(r+u) = C_{x}(r+u)$. Notice that these are just bits.
+
+    The probability of a single bit being corrupted is at most $\delta$. Therefore, the probability that two bits
+    are corrupted is at most $2\delta$.
+
+
+\end{proof}
+
+The Hadamard code is locally decodable, which is why it's very useful for PCPs.
+
+Codewords of the Hadamard code are precisely the linear functions
+$F_{2}^{n} \xrightarrow{} F_{2}$. There are $2^{n}$ such linear functions since every function
+is fully determined by $\alpha_{1}, ..., \alpha_{n}$ such that $x \mapsto \alpha_{1}x_{1} + ... + \alpha_{n}x_{n}$.
+
+\begin{algorithm}
+    \caption{Algorithm T}
+    \begin{algorithmic}
+        \Require $C \in F_{2}^{2^{n}}$
+        \Ensure $C$ is linear.
+        \State $u,v \xleftarrow{\$} \in F_{2}^{n}$
+        \State Output YES if $C(u+v) = C(u) + C(v)$.
+    \end{algorithmic}
+\end{algorithm}
+
+Hadamard matrices and orthonormal bases.
+
+
+
+\begin{proposition}
+    The functions $(-1)^{C_{x}}, x \in F_{2}^{n}$ form an orthonormal basis
+    for $\R^{F_{2}^{n}}$ under the inner product
+
+    \[ \langle f,g \rangle = \frac{1}{2^{n}}\sum_{u \in F_{2}^{n}} f(u)g(u) \]
+\end{proposition}
+
+\[ \langle (-1)^{C_{x}}, (-1)^{C_{y}} \rangle = \begin{cases}
+    1 & x = y \\ 
+    0 & x \neq y
+\end{cases}\]
+
+\newpage
+
+\section{Locally Decodable Codes (LDC)}
+
+\subsection{Resources}
+
+\begin{enumerate}
+    \item Zeev Dvir IAS Talk on LDCs
+    \item Zeev Dvir LDC course
+    \item Private LDCs paper by Rafi and Sahai in 2007
+    \item Sergey Yekhanin's LDC monograph
+    \item 
+\end{enumerate}
+
+Since LDCs require more than regular ECCs, they require longer codewords than classical
+ECCs.
+
+
+
+\newpage
+
+
+\end{document}
+
+
